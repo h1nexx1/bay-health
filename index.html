@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#f4fdf0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Bay Health+">
+<title>Bay Health+</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/my-photo.jpg">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="bg-pattern pattern-top"></div>
+<div class="bg-pattern pattern-bottom"></div>
+
+<!-- ================= ЭКРАН ВХОДА ================= -->
+<div id="authScreen" class="auth-overlay">
+  <div class="auth-card">
+    <div class="lock">💚</div>
+    <h2 id="authTitle">Создай профиль</h2>
+    <p class="subtitle" id="authSubtitle">Придумай 4-значный код</p>
+    <input type="text" id="authName" placeholder="Твое имя" autocomplete="off" style="text-align: center; margin-bottom: 20px;">
+    <div class="pin-dots">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <div class="numpad">
+      <button onclick="pressPin(1)">1</button><button onclick="pressPin(2)">2</button><button onclick="pressPin(3)">3</button>
+      <button onclick="pressPin(4)">4</button><button onclick="pressPin(5)">5</button><button onclick="pressPin(6)">6</button>
+      <button onclick="pressPin(7)">7</button><button onclick="pressPin(8)">8</button><button onclick="pressPin(9)">9</button>
+      <button class="empty-btn"></button><button onclick="pressPin(0)">0</button><button onclick="deletePin()" class="del-btn">⌫</button>
+    </div>
+    <div class="auth-error" id="authError"></div>
+  </div>
+</div>
+
+<!-- ================= ПРИЛОЖЕНИЕ ================= -->
+<div id="app" class="container hidden">
+
+  <header>
+    <h1>Bay Health+</h1>
+  </header>
+
+  <!-- ГЛАВНЫЙ ЭКРАН -->
+  <div id="screen-home" class="screen active-screen">
+    <div class="date-selector">
+      <button onclick="changeDay(-1)">◀</button>
+      <span id="currentDateLabel">Сегодня</span>
+      <button onclick="changeDay(1)">▶</button>
+    </div>
+
+    <div class="greeting-card">
+      <div>
+        <h2>Привет, <span id="uiUserName">...</span>!</h2>
+        <p>Двигайся к<br>лучшей версии себя</p>
+      </div>
+      <div class="pulse-icon"><img src="icons/heart.svg" alt="heart" style="width: 50px; height: 50px;"></div>
+    </div>
+
+    <!-- ШАГИ -->
+    <div class="card" onclick="openEditModal('steps')" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="grid-icon" style="background: #f0fdf4; color: #16a34a;">
+          <img src="icons/home.svg" alt="steps" style="width: 24px; height: 24px;">
+        </div>
+        <div><strong>Шаги</strong><p style="font-size: 0.75rem; color: #888;">Сегодня</p></div>
+      </div>
+      <div style="font-size: 1.2rem; font-weight: 700;"><span id="uiSteps">0</span> <span style="font-size: 1rem;">✏️</span></div>
+    </div>
+
+    <!-- КАЛОРИИ -->
+    <div class="grid-menu" style="grid-template-columns: 1fr 1fr; margin-bottom: 15px;">
+      <div class="grid-item" onclick="openEditModal('activeCalories')">
+        <div class="grid-icon" style="background: #fef2f2; color: #ef4444;">
+          <img src="icons/actkal.svg" alt="active" style="width: 24px; height: 24px;">
+        </div>
+        <div class="grid-text"><strong>Активные</strong><span>Ккал: <span id="uiActiveCalories">0</span></span></div>
+        <div class="edit-pencil">✏️</div>
+      </div>
+      <div class="grid-item" onclick="openEditModal('restCalories')">
+        <div class="grid-icon" style="background: #e0f2fe; color: #0284c7;">
+          <img src="icons/pokoy.svg" alt="rest" style="width: 24px; height: 24px;">
+        </div>
+        <div class="grid-text"><strong>Покой</strong><span>Ккал: <span id="uiRestCalories">0</span></span></div>
+        <div class="edit-pencil">✏️</div>
+      </div>
+    </div>
+
+    <!-- ПИТАНИЕ, ВЕС, ЭМОЦИИ -->
+    <div class="grid-menu">
+      <div class="grid-item" onclick="openFoodHistoryModal()">
+        <div class="grid-icon" style="background: #f0fdf4; color: #16a34a;">
+          <img src="icons/food.svg" alt="food" style="width: 24px; height: 24px;">
+        </div>
+        <div class="grid-text"><strong>Питание</strong><span>Ккал: <span id="uiFood">0</span></span></div>
+        <div class="edit-pencil">📜</div>
+      </div>
+      <div class="grid-item" onclick="openEditModal('weight')">
+        <div class="grid-icon" style="background: #fffbeb; color: #f59e0b;">
+          <img src="icons/weight.svg" alt="weight" style="width: 24px; height: 24px;">
+        </div>
+        <div class="grid-text"><strong>Вес</strong><span>Кг: <span id="uiWeight">0</span></span></div>
+        <div class="edit-pencil">✏️</div>
+      </div>
+      <div class="grid-item" onclick="openMoodModal()" style="grid-column: span 2;">
+        <div class="grid-icon" style="background: #fdf2f8; color: #db2777;">
+          <img src="icons/mood.svg" alt="mood" style="width: 24px; height: 24px;">
+        </div>
+        <div class="grid-text"><strong>Настроение</strong><span id="uiMood">Выбрать</span></div>
+        <div class="edit-pencil">✏️</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СТАТИСТИКА -->
+  <div id="screen-progress" class="screen">
+    <h2 style="margin-bottom: 15px; font-size: 1.3rem;">Статистика</h2>
+
+    <div class="card">
+      <h3 style="margin-bottom: 10px; font-size: 1rem;">Календарь сна</h3>
+      <div id="sleepCalendar" class="sleep-calendar-grid"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 10px; font-size: 1rem;">Шаги (30 дней)</h3>
+      <div id="statsStepsChart" class="month-chart"></div>
+      <p style="text-align: right; font-size: 0.85rem; margin-top: 5px; font-weight: 600;">Среднее за неделю: <span id="avgSteps">0</span></p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 10px; font-size: 1rem;">Активные калории (30 дней)</h3>
+      <div id="statsCalActiveChart" class="month-chart"></div>
+      <p style="text-align: right; font-size: 0.85rem; margin-top: 5px; font-weight: 600;">Среднее за неделю: <span id="avgActive">0</span></p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 10px; font-size: 1rem;">Калории покоя (30 дней)</h3>
+      <div id="statsCalRestChart" class="month-chart"></div>
+      <p style="text-align: right; font-size: 0.85rem; margin-top: 5px; font-weight: 600;">Среднее за неделю: <span id="avgRest">0</span></p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 10px; font-size: 1rem;">Настроение</h3>
+      <div id="statsMoodList" style="display: flex; flex-wrap: wrap; gap: 5px; font-size: 1.5rem;"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 10px; font-size: 1rem;">История питания</h3>
+      <div id="statsFoodHistory" style="max-height: 150px; overflow-y: auto; font-size: 0.85rem;"></div>
+    </div>
+  </div>
+
+  <!-- ДОСТИЖЕНИЯ -->
+  <div id="screen-achievements" class="screen">
+    <h2 style="margin-bottom: 15px; font-size: 1.3rem;">Достижения</h2>
+    <div id="achievementsList"><p style="color:#888;">Скоро здесь появятся медали!</p></div>
+  </div>
+
+  <!-- ПРОФИЛЬ С ФОТО -->
+  <div id="screen-profile" class="screen">
+    <h2 style="margin-bottom: 15px; font-size: 1.3rem;">Профиль</h2>
+    <div class="card profile-card">
+
+      <div class="profile-avatar" style="position: relative; cursor: pointer;" onclick="document.getElementById('photoInput').click()">
+        <div id="profileAvatarDisplay" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">👤</div>
+        <div style="position: absolute; bottom: 0; right: 0; background: #22c55e; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">📷</div>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="uploadPhoto(event)">
+
+      <h3 id="profileName">Имя</h3>
+      <div class="profile-stats">
+        <div class="p-stat"><span>Возраст</span><input type="number" id="profileAge" onchange="updateProfile()"></div>
+        <div class="p-stat"><span>Рост (см)</span><input type="number" id="profileHeight" onchange="updateProfile()"></div>
+        <div class="p-stat"><span>Вес (кг)</span><input type="number" id="profileWeight" step="0.1" onchange="updateProfile()"></div>
+      </div>
+      <button class="btn-danger" style="margin-top: 20px; width: 100%;" onclick="logout()">Выйти</button>
+    </div>
+  </div>
+
+  <!-- HEALTH AI -->
+  <div id="screen-ai" class="screen">
+    <div class="card ai-container">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h2 style="font-size:1.1rem;">Health AI</h2>
+        <span id="aiLimitInfo" style="font-size: 0.75rem; color: #888;">Осталось: 500</span>
+      </div>
+
+      <div class="ai-quick-actions">
+        <button onclick="askAIPreset('Сделай вывод дня')">Вывод дня</button>
+        <button onclick="askAIPreset('Что мне улучшить?')">Что улучшить?</button>
+      </div>
+
+      <div id="chatBox" class="chat-box">
+        <div class="chat-msg bot">Привет! Я твой Health AI. Я вижу твои данные за день. Спроси меня, как твои успехи или что можно улучшить!</div>
+      </div>
+
+      <div class="chat-input-area">
+        <input type="text" id="aiChatInput" placeholder="Написать Health AI..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+        <button class="send-btn" onclick="sendChatMessage()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНЫЕ ОКНА -->
+  <div id="editModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h3 id="modalTitle">Изменить данные</h3>
+      <div class="input-group">
+        <label id="modalLabel">Значение</label>
+        <input type="number" id="modalInput" step="0.1">
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button class="btn-primary" style="flex: 1;" onclick="saveData()">Сохранить</button>
+        <button class="btn-secondary" style="flex: 1;" onclick="closeModal()">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="moodModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h3 style="text-align: center; margin-bottom: 15px;">Как ты сегодня?</h3>
+      <div class="mood-options" id="moodOptions">
+        <button onclick="selectMood('😭')">😭</button><button onclick="selectMood('🙁')">🙁</button>
+        <button onclick="selectMood('😐')">😐</button><button onclick="selectMood('🙂')">🙂</button>
+        <button onclick="selectMood('😄')">😄</button>
+      </div>
+      <div class="input-group" style="margin-top: 15px;">
+        <label>Почему ты так себя чувствуешь?</label>
+        <textarea id="moodNote" style="height: 80px;"></textarea>
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button class="btn-primary" style="flex: 1;" onclick="saveMood()">Сохранить</button>
+        <button class="btn-secondary" style="flex: 1;" onclick="closeMoodModal()">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="foodHistoryModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h3 style="text-align: center; margin-bottom: 15px;">История питания за сегодня</h3>
+      <div id="foodHistoryList" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px; font-size: 0.9rem;"></div>
+      <button class="btn-primary" style="width: 100%;" onclick="closeFoodHistoryModal()">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- НИЖНЕЕ МЕНЮ -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-home" onclick="switchScreen('home')">
+      <img src="icons/home.svg" style="width: 24px; height: 24px;"><span>Главная</span>
+    </button>
+    <button class="nav-item" id="nav-progress" onclick="switchScreen('progress')">
+      <img src="icons/static.svg" style="width: 24px; height: 24px;"><span>Статистика</span>
+    </button>
+
+    <!-- ЦЕНТРАЛЬНАЯ КНОПКА СО СТОКОВОЙ ЗВЕЗДОЧКОЙ -->
+    <button class="nav-item central-btn" onclick="switchScreen('ai')">
+      <div class="central-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FACC15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+      </div>
+    </button>
+
+    <button class="nav-item" id="nav-achievements" onclick="switchScreen('achievements')">
+      <img src="icons/dosij.svg" style="width: 24px; height: 24px;"><span>Достижения</span>
+    </button>
+    <button class="nav-item" id="nav-profile" onclick="switchScreen('profile')">
+      <img src="icons/weight.svg" style="width: 24px; height: 24px;"><span>Профиль</span>
+    </button>
+  </nav>
+
+</div> <!-- Конец .container #app -->
+
+<script src="/app.js"></script>
+</body>
+</html>
